@@ -4,7 +4,7 @@ import Canvas from '../js/Canvas.js';
 
 // Add favicon.
 import faviconImg from '../images/favicon.ico';
-(()=>{
+(() => {
     let link = document.createElement('link');
     link.type = 'image/x-icon';
     link.rel = 'shortcut icon';
