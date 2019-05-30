@@ -30,7 +30,6 @@ export default class Sprite{
      * @param {number} direction A number representing the direction the sprite is facing.
      */
     draw(ctx, x, y, direction){
-        console.log(direction);
         
         // When the draw counter equals this.rate, draw the sprite.
         if(this.drawCounter === this.rate){
