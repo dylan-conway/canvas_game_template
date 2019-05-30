@@ -27,8 +27,10 @@ export default class Sprite{
      * @param {canvas context} ctx The context of the desired canvas.
      * @param {number} x X coordinate.
      * @param {number} y Y coordinate.
+     * @param {number} direction A number representing the direction the sprite is facing.
      */
-    draw(ctx, x, y){
+    draw(ctx, x, y, direction){
+        console.log(direction);
         
         // When the draw counter equals this.rate, draw the sprite.
         if(this.drawCounter === this.rate){
@@ -47,7 +49,7 @@ export default class Sprite{
         // pixels in the image.
         ctx.drawImage(
             this.img,
-            this.info[0], this.info[1],
+            this.info[0], this.info[1] + (this.height * direction),
             this.info[2], this.info[3],
             x, y,
             this.info[4], this.info[5]
