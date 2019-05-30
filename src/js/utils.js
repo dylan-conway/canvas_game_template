@@ -15,3 +15,7 @@ export function setFavicon(faviconImg){
 export function calcDiag(speed){
     return Math.sqrt((speed ** 2) / 2);
 }
+
+export function round(num){
+    return Math.round(num);
+}

@@ -10,6 +10,8 @@ import * as utils from '../js/utils.js';
 
 // Import images.
 import faviconImg from '../images/favicon.ico';
+import characterImg from '../images/character.png';
+import { createContext } from 'vm';
 
 // Width and height of the canvas.
 const WIDTH = 1024;
@@ -59,49 +61,95 @@ let g = {
         objects.draw();
         player.draw();
     },
+    moveX: function(obj, dist){
+        obj.x += dist;
+    },
+    moveY: function(obj, dist){
+        obj.y += dist;
+    },
+    moveUp: function(obj, dist){
+        obj.y -= dist;
+    },
+    moveRight: function(obj, dist){
+        obj.x += dist;
+    },
+    moveDown: function(obj, dist){
+        obj.y += dist;
+    },
+    moveLeft: function(obj, dist){
+        obj.x -= dist;
+    }
 };
 
 // Player states.
-const pStates = {
+const states = {
     STANDING: 1,
     RUNNING: 2,
     JUMPING: 3
 };
 
+// Player commands.
+const commands = {
+    MOVE_UP: 1,
+    MOVE_RIGHT: 2,
+    MOVE_DOWN: 3,
+    MOVE_LEFT: 4,
+    MOVE_UP_LEFT: 5,
+    MOVE_UP_RIGHT: 6,
+    MOVE_DOWN_RIGHT: 7,
+    MOVE_DOWN_LEFT: 8
+}
+
 // Player object.
 let player = {
     x: 30,
     y: 30,
-    width: 64,
-    height: 64,
-    speed: 10,
-    state: pStates.STANDING,
+    width: 32,
+    height: 32,
+    img: utils.newImage(characterImg),
+    speed: 8,
+    state: states.STANDING,
     moveX: function(speed){
         this.x += speed;
     },
     moveY: function(speed){
         this.y += speed;
     },
-    moveUp: function(speed){
-        this.y -= speed;
-    },
-    moveRight: function(speed){
-        this.x += speed;
-    },
-    moveDown: function(speed){
-        this.y += speed;
-    },
-    moveLeft: function(speed){
-        this.x -= speed;
-    },
     draw: function(){
-        c.ctx.fillRect(this.x, this.y, this.width, this.height);
+        // c.ctx.fillRect((this.x), (this.y), this.width, this.height);
+        c.ctx.drawImage(this.img, this.x, this.y);
     },
-    handleInput: function(method){
-        // switch(this.state){
-        //     case STANDING:
-        //         if()
-        // }
+    handleCommands: function(command){
+        switch(command){
+            case commands.MOVE_UP:
+                g.moveUp(this, this.speed);
+                break;
+            case commands.MOVE_RIGHT:
+                g.moveRight(this, this.speed);
+                break;
+            case commands.MOVE_DOWN:
+                g.moveDown(this, this.speed);
+                break;
+            case commands.MOVE_LEFT:
+                g.moveLeft(this, this.speed);
+                break;
+            case commands.MOVE_UP_LEFT:
+                g.moveUp(this, utils.calcDiag(this.speed));
+                g.moveLeft(this, utils.calcDiag(this.speed));
+                break;
+            case commands.MOVE_UP_RIGHT:
+                g.moveUp(this, utils.calcDiag(this.speed));
+                g.moveRight(this, utils.calcDiag(this.speed));
+                break;
+            case commands.MOVE_DOWN_RIGHT:
+                g.moveDown(this, utils.calcDiag(this.speed));
+                g.moveRight(this, utils.calcDiag(this.speed));
+                break;
+            case commands.MOVE_DOWN_LEFT:
+                g.moveDown(this, utils.calcDiag(this.speed));
+                g.moveLeft(this, utils.calcDiag(this.speed));
+                break;
+        }
     }
 };
 
@@ -117,7 +165,6 @@ let gameLoop = () => {
 
     // Update.
     g.update();
-    console.log(player.x, player.y);
     
     // Clear canvas then render.
     c.clear();
@@ -130,8 +177,8 @@ let setUpDocument = () => {
     utils.setFavicon(faviconImg);
 
     // Add event listeners for keyup and keydown.
-    window.addEventListener('keydown', (e) => {Key.onKeyDown(e);}, false);
-    window.addEventListener('keyup', (e) => {Key.onKeyUp(e);}, false);
+    window.addEventListener('keydown', e => {Key.onKeyDown(e);}, false);
+    window.addEventListener('keyup', e => {Key.onKeyUp(e);}, false);
 }
 
 let setUpObjects = () => {
@@ -148,25 +195,33 @@ let processInput = () => {
 
     // Keyboard.
     if(Key.isDown(Key.UP) && Key.isDown(Key.RIGHT)){
-        player.moveUp(utils.calcDiag(player.speed));
-        player.moveRight(utils.calcDiag(player.speed));
+        player.handleCommands(commands.MOVE_UP_RIGHT);
+        // player.moveUp(utils.calcDiag(player.speed));
+        // player.moveRight(utils.calcDiag(player.speed));
     }else if(Key.isDown(Key.RIGHT) && Key.isDown(Key.DOWN)){
-        player.moveRight(utils.calcDiag(player.speed));
-        player.moveDown(utils.calcDiag(player.speed));
+        player.handleCommands(commands.MOVE_DOWN_RIGHT);
+        // player.moveRight(utils.calcDiag(player.speed));
+        // player.moveDown(utils.calcDiag(player.speed));
     }else if(Key.isDown(Key.DOWN) && Key.isDown(Key.LEFT)){
-        player.moveDown(utils.calcDiag(player.speed));
-        player.moveLeft(utils.calcDiag(player.speed));
+        player.handleCommands(commands.MOVE_DOWN_LEFT);
+        // player.moveDown(utils.calcDiag(player.speed));
+        // player.moveLeft(utils.calcDiag(player.speed));
     }else if(Key.isDown(Key.LEFT) && Key.isDown(Key.UP)){
-        player.moveLeft(utils.calcDiag(player.speed));
-        player.moveUp(utils.calcDiag(player.speed));
+        player.handleCommands(commands.MOVE_UP_LEFT);
+        // player.moveLeft(utils.calcDiag(player.speed));
+        // player.moveUp(utils.calcDiag(player.speed));
     }else if(Key.isDown(Key.UP)){
-        player.moveUp(player.speed);
+        player.handleCommands(commands.MOVE_UP);
+        // player.moveUp(player.speed);
     }else if(Key.isDown(Key.RIGHT)){
-        player.moveRight(player.speed);
+        player.handleCommands(commands.MOVE_RIGHT);
+        // player.moveRight(player.speed);
     }else if(Key.isDown(Key.DOWN)){
-        player.moveDown(player.speed);
+        player.handleCommands(commands.MOVE_DOWN);
+        // player.moveDown(player.speed);
     }else if(Key.isDown(Key.LEFT)){
-        player.moveLeft(player.speed);
+        player.handleCommands(commands.MOVE_LEFT);
+        // player.moveLeft(player.speed);
     }
 
     // Mouse.
