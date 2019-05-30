@@ -13,7 +13,10 @@ export function setFavicon(faviconImg){
 }
 
 export function calcDiag(speed){
-    return Math.sqrt((speed ** 2) / 2);
+    // Return the rounded distance because trying to keep everything
+    // whole. I don't round every time on game draw because of performance
+    // issues.
+    return Math.round(Math.sqrt((speed ** 2) / 2));
 }
 
 export function round(num){
