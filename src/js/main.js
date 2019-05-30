@@ -1,4 +1,10 @@
 
+/*
+    Currently untitled 2d game.
+
+    Author: Dylan Conway
+*/
+
 // Import CSS.
 import '../css/style.css';
 
@@ -6,19 +12,20 @@ import '../css/style.css';
 import Canvas from '../js/Canvas.js';
 import Objects from '../js/Objects.js';
 import Key from '../js/Keyboard.js';
+import Sprite from '../js/Sprite.js';
 import * as utils from '../js/utils.js';
+import {states, commands, face} from '../js/Enums.js';
 
 // Import images.
 import faviconImg from '../images/favicon.ico';
-import characterImg from '../images/character.png';
-import { createContext } from 'vm';
+import characterImg from '../images/characterTest.png';
 
 // Width and height of the canvas.
 const WIDTH = 1024;
 const HEIGHT = 768;
 
 // Canvas class and canvas objects class.
-let c, objects;
+let c, g, player, objects;
 
 window.onload = e => {
     // window.onload event info.
@@ -34,124 +41,118 @@ window.onload = e => {
     gameLoop();
 }
 
-let g = {
-    name: 'game',
-    blocking: false,
-    update: function(){
+class Game{
+    constructor(){
+        this.name = 'game';
+        this.blocking = false;
+    }
+    update(){
         // Check collisions.
         if(player.x < 0){
             let diff = 0 - player.x;
-            player.moveX(diff);
+            this.moveX(player, diff);
         }
         if(player.y < 0){
             let diff = 0 - player.y;
-            player.moveY(diff);
+            this.moveY(player, diff);
         }
         if(player.x + player.width > WIDTH){
             let diff = WIDTH - (player.x + player.width);
-            player.moveX(diff);
+            this.moveX(player, diff);
         }
         if(player.y + player.height > HEIGHT){
             let diff = HEIGHT - (player.y + player.height);
-            player.moveY(diff)
+            this.moveY(player, diff)
         }
-    },
-    draw: function(){
+    }
+    draw(){
         // Draw game objects.
         objects.draw();
         player.draw();
-    },
-    moveX: function(obj, dist){
+    }
+    moveX(obj, dist){
         obj.x += dist;
-    },
-    moveY: function(obj, dist){
+    }
+    moveY(obj, dist){
         obj.y += dist;
-    },
-    moveUp: function(obj, dist){
+    }
+    moveUp(obj, dist){
         obj.y -= dist;
-    },
-    moveRight: function(obj, dist){
+    }
+    moveRight(obj, dist){
         obj.x += dist;
-    },
-    moveDown: function(obj, dist){
+    }
+    moveDown(obj, dist){
         obj.y += dist;
-    },
-    moveLeft: function(obj, dist){
+    }
+    moveLeft(obj, dist){
         obj.x -= dist;
     }
-};
-
-// Player states.
-const states = {
-    STANDING: 1,
-    RUNNING: 2,
-    JUMPING: 3
-};
-
-// Player commands.
-const commands = {
-    MOVE_UP: 1,
-    MOVE_RIGHT: 2,
-    MOVE_DOWN: 3,
-    MOVE_LEFT: 4,
-    MOVE_UP_LEFT: 5,
-    MOVE_UP_RIGHT: 6,
-    MOVE_DOWN_RIGHT: 7,
-    MOVE_DOWN_LEFT: 8
 }
 
-// Player object.
-let player = {
-    x: 30,
-    y: 30,
-    width: 32,
-    height: 32,
-    img: utils.newImage(characterImg),
-    speed: 8,
-    state: states.STANDING,
-    moveX: function(speed){
+// Player class.
+class Player{
+    constructor(width, height, imgSrc, rate){
+        this.x = 300;
+        this.y = 250;
+        this.width = width;
+        this.height = height;
+        this.rate = rate
+        this.sprite = new Sprite(imgSrc, this.rate, this.width, this.height);
+        this.speed = 4;
+        this.state = states.STANDING;
+        this.facing = face.SOUTH;
+    }
+    moveX(speed){
         this.x += speed;
-    },
-    moveY: function(speed){
+    }
+    moveY(speed){
         this.y += speed;
-    },
-    draw: function(){
-        // c.ctx.fillRect((this.x), (this.y), this.width, this.height);
-        c.ctx.drawImage(this.img, this.x, this.y);
-    },
-    handleCommands: function(command){
+    }
+    draw(){
+        this.sprite.draw(c.ctx, this.x, this.y, this.facing);
+    }
+    handleCommands(command){
         switch(command){
             case commands.MOVE_UP:
+                this.facing = face.NORTH;
                 g.moveUp(this, this.speed);
                 break;
             case commands.MOVE_RIGHT:
+                this.facing = face.EAST;
                 g.moveRight(this, this.speed);
                 break;
             case commands.MOVE_DOWN:
+                this.facing = face.SOUTH;
                 g.moveDown(this, this.speed);
                 break;
             case commands.MOVE_LEFT:
+                this.facing = face.WEST;
                 g.moveLeft(this, this.speed);
                 break;
             case commands.MOVE_UP_LEFT:
+                this.facing = face.NORTH_WEST;
                 g.moveUp(this, utils.calcDiag(this.speed));
                 g.moveLeft(this, utils.calcDiag(this.speed));
                 break;
             case commands.MOVE_UP_RIGHT:
+                this.facing = face.NORTH_EAST;
                 g.moveUp(this, utils.calcDiag(this.speed));
                 g.moveRight(this, utils.calcDiag(this.speed));
                 break;
             case commands.MOVE_DOWN_RIGHT:
+                this.facing = face.SOUTH_EAST;
                 g.moveDown(this, utils.calcDiag(this.speed));
                 g.moveRight(this, utils.calcDiag(this.speed));
                 break;
             case commands.MOVE_DOWN_LEFT:
+                this.facing = face.SOUTH_WEST
                 g.moveDown(this, utils.calcDiag(this.speed));
                 g.moveLeft(this, utils.calcDiag(this.speed));
                 break;
         }
     }
-};
+}
 
 let gameLoop = () => {
     requestAnimationFrame(gameLoop);
@@ -165,6 +166,7 @@ let gameLoop = () => {
 
     // Update.
     g.update();
+    // console.log(player.x, player.y);
     
     // Clear canvas then render.
     c.clear();
@@ -188,41 +190,33 @@ let setUpObjects = () => {
     c = new Canvas(canvasElem, WIDTH, HEIGHT);
 
     // Game objects.
+    g = new Game();
+    player = new Player(32, 48, characterImg, 10);
     objects = new Objects();
 }
 
 let processInput = () => {
 
     // Keyboard.
+    let command;
     if(Key.isDown(Key.UP) && Key.isDown(Key.RIGHT)){
-        player.handleCommands(commands.MOVE_UP_RIGHT);
-        // player.moveUp(utils.calcDiag(player.speed));
-        // player.moveRight(utils.calcDiag(player.speed));
+        command = commands.MOVE_UP_RIGHT
     }else if(Key.isDown(Key.RIGHT) && Key.isDown(Key.DOWN)){
-        player.handleCommands(commands.MOVE_DOWN_RIGHT);
-        // player.moveRight(utils.calcDiag(player.speed));
-        // player.moveDown(utils.calcDiag(player.speed));
+        command = commands.MOVE_DOWN_RIGHT;
     }else if(Key.isDown(Key.DOWN) && Key.isDown(Key.LEFT)){
-        player.handleCommands(commands.MOVE_DOWN_LEFT);
-        // player.moveDown(utils.calcDiag(player.speed));
-        // player.moveLeft(utils.calcDiag(player.speed));
+        command = commands.MOVE_DOWN_LEFT;
     }else if(Key.isDown(Key.LEFT) && Key.isDown(Key.UP)){
-        player.handleCommands(commands.MOVE_UP_LEFT);
-        // player.moveLeft(utils.calcDiag(player.speed));
-        // player.moveUp(utils.calcDiag(player.speed));
+        command = commands.MOVE_UP_LEFT;
     }else if(Key.isDown(Key.UP)){
-        player.handleCommands(commands.MOVE_UP);
-        // player.moveUp(player.speed);
+        command = commands.MOVE_UP;
     }else if(Key.isDown(Key.RIGHT)){
-        player.handleCommands(commands.MOVE_RIGHT);
-        // player.moveRight(player.speed);
+        command = commands.MOVE_RIGHT;
     }else if(Key.isDown(Key.DOWN)){
-        player.handleCommands(commands.MOVE_DOWN);
-        // player.moveDown(player.speed);
+        command = commands.MOVE_DOWN;
     }else if(Key.isDown(Key.LEFT)){
-        player.handleCommands(commands.MOVE_LEFT);
-        // player.moveLeft(player.speed);
+        command = commands.MOVE_LEFT;
     }
+    player.handleCommands(command);
 
     // Mouse.
 
