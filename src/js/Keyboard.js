@@ -1,21 +1,17 @@
+
 let Key = {
-
     _pressed: {},
-
-    UP: 38,
-    RIGHT: 39,
-    DOWN: 40,
-    LEFT: 37,
-
-    isDown: (keyCode) => {
+    UP: 87,
+    RIGHT: 68,
+    DOWN: 83,
+    LEFT: 65,
+    isDown: function(keyCode){
         return this._pressed[keyCode];
     },
-
-    onKeyDown: (event) => {
+    onKeyDown: function(event){
         this._pressed[event.keyCode] = event.timeStamp;
     },
-
-    onKeyup: (event) => {
+    onKeyUp: function(event){
         delete this._pressed[event.keyCode];
     }
 }

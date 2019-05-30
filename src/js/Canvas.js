@@ -20,6 +20,13 @@ export default class Canvas{
     }
 
     /**
+     * Clears the entire canvas.
+     */
+    clear(){
+        this.ctx.clearRect(0, 0, this.width, this.height);
+    }
+
+    /**
      * Sets all colors for the context.
      */
     setColors(){

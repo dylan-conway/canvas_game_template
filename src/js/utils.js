@@ -11,3 +11,7 @@ export function setFavicon(faviconImg){
     link.href = faviconImg;
     document.getElementsByTagName('head')[0].appendChild(link);
 }
+
+export function calcDiag(speed){
+    return Math.sqrt((speed ** 2) / 2);
+}
