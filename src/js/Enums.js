@@ -2,7 +2,6 @@
 export const states = {
     STANDING: 0,
     RUNNING: 1,
-    JUMPING: 2
 };
 
 // Player commands.
