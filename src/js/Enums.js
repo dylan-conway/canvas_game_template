@@ -1,20 +1,21 @@
 // Player states.
 export const states = {
-    STANDING: 1,
-    RUNNING: 2,
-    JUMPING: 3
+    STANDING: 0,
+    RUNNING: 1,
+    JUMPING: 2
 };
 
 // Player commands.
 export const commands = {
-    MOVE_UP: 1,
-    MOVE_RIGHT: 2,
-    MOVE_DOWN: 3,
-    MOVE_LEFT: 4,
-    MOVE_UP_LEFT: 5,
-    MOVE_UP_RIGHT: 6,
-    MOVE_DOWN_RIGHT: 7,
-    MOVE_DOWN_LEFT: 8
+    MOVE_UP: 0,
+    MOVE_RIGHT: 1,
+    MOVE_DOWN: 2,
+    MOVE_LEFT: 3,
+    MOVE_UP_LEFT: 4,
+    MOVE_UP_RIGHT: 5,
+    MOVE_DOWN_RIGHT: 6,
+    MOVE_DOWN_LEFT: 7,
+    STAND: 8
 }
 
 // Facing directions.
