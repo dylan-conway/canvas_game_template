@@ -48,7 +48,7 @@ export default class Sprite{
         // pixels in the image.
         ctx.drawImage(
             this.img,
-            this.info[0], this.info[1] + (this.height * direction) + (8 * this.height * state),
+            this.info[0], this.info[1] + (this.height * direction), //+ (8 * this.height * state),
             this.info[2], this.info[3],
             x, y,
             this.info[4], this.info[5]
