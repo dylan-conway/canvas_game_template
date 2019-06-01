@@ -24,13 +24,12 @@ import characterImg from '../images/characterSprite.png';
 import mapImg from '../images/rewoven.png'
 
 // Width and height of the canvas.
-const WIDTH = 1024;
-const HEIGHT = 768;
+window.WIDTH = 1024;
+window.HEIGHT = 768;
 
-// Canvas class and canvas objects classes.
-let c, player, objects, map;
+// Canvas class and canvas objects classes. Global.
 
-let blocking = false;
+window.blocking = false;
 
 function update(command){
     switch(command){
@@ -38,25 +37,21 @@ function update(command){
             if(player.y + player.height / 2 < map.y){
                 moveDown(-(map.y - (player.y + player.height / 2)));
             }
-            // objects.checkUpCollisions(player);
             break;
         case commands.MOVE_RIGHT:
             if(player.x + player.width > map.x + map.width){
                 moveLeft(-((player.x + player.width) - (map.x + map.width)));
             }
-            // objects.checkRightCollisions(player);
             break;
         case commands.MOVE_DOWN:
             if(player.y + player.height > map.y + map.height){
                 moveUp(-((player.y + player.height) - (map.y + map.height)));
             }
-            // objects.checkDownCollisions(player);
             break;
         case commands.MOVE_LEFT:
             if(player.x < map.x){
                 moveRight(-(map.x - player.x));
             }
-            // objects.checkLeftCollisions(player);
             break;
         case commands.MOVE_UP_LEFT:
             if(player.y + player.height / 2 < map.y){
@@ -65,8 +60,6 @@ function update(command){
             if(player.x < map.x){
                 moveRight(-(map.x - player.x));
             }
-            // objects.checkUpCollisions(player);
-            // objects.checkLeftCollisions(player);
             break;
         case commands.MOVE_UP_RIGHT:
             if(player.y + player.height / 2 < map.y){
@@ -75,8 +68,6 @@ function update(command){
             if(player.x + player.width > map.x + map.width){
                 moveLeft(-((player.x + player.width) - (map.x + map.width)));
             }
-            // objects.checkUpCollisions(player);
-            // objects.checkRightCollisions(player);
             break;
         case commands.MOVE_DOWN_RIGHT:
             if(player.y + player.height > map.y + map.height){
@@ -85,8 +76,6 @@ function update(command){
             if(player.x + player.width > map.x + map.width){
                 moveLeft(-((player.x + player.width) - (map.x + map.width)));
             }
-            // objects.checkDownCollisions(player);
-            // objects.checkRightCollisions(player);
             break;
         case commands.MOVE_DOWN_LEFT:
             if(player.y + player.height > map.y + map.height){
@@ -95,41 +84,10 @@ function update(command){
             if(player.x < map.x){
                 moveRight(-(map.x - player.x));
             }
-            // objects.checkDownCollisions(player);
-            // objects.checkLeftCollisions(player);
             break;
     }
 }
-function draw(){
-    map.draw(c.ctx);
-    objects.draw(c.ctx);
-    player.draw(c.ctx);
-}
-function moveUp(dist){
-    map.y -= dist;
-    objects.moveUp(dist);
-    objects.checkDownCollisions(player);
-}
-function moveRight(dist){
-    map.x += dist;
-    objects.moveRight(dist);
-    objects.checkLeftCollisions(player);
-}
-function moveDown(dist){
-    map.y += dist;
-    objects.moveDown(dist);
-    objects.checkUpCollisions(player);
-}
-function moveLeft(dist){
-    map.x -= dist;
-    objects.moveLeft(dist);
-    objects.checkRightCollisions(player);
-}
-window.moveUp = moveUp;
-window.moveRight = moveRight;
-window.moveDown = moveDown;
-window.moveLeft = moveLeft;
-window.map = map;
+
 function handleCommands(command){
     let speed = player.speed;
     let diag = utils.calcDiag(player.speed);
@@ -198,29 +156,6 @@ window.onload = e => {
     gameLoop();
 }
 
-// Player class.
-class Player{
-    constructor(width, height, imgSrc, rate){
-        this.width = width;
-        this.height = height;
-        this.x = (WIDTH / 2) - (this.width / 2);
-        this.y = (HEIGHT / 2) - (this.height / 2);
-        this.rate = rate
-        this.sprite = new Sprite(imgSrc, this.rate, this.width, this.height);
-        // 3
-        this.speed = 5;
-        this.state = states.STANDING;
-        this.facing = face.SOUTH;
-    }
-    draw(ctx){
-        ctx.beginPath();
-        ctx.ellipse(this.x + (this.width / 2), this.y + this.height, this.width / 2, this.width / 4, Math.PI * 2, 0, Math.PI * 2, false);
-        c.setFillColor('rgba(0, 0, 0, .4');
-        ctx.fill();
-        this.sprite.draw(ctx, this.x, this.y, this.facing, this.state);
-    }
-}
-
 let gameLoop = () => {
     requestAnimationFrame(gameLoop);
 
@@ -232,8 +167,8 @@ let gameLoop = () => {
 
     // Update (check for collisions, make corrections).
     update(command);
-    // console.log(player.x, player.y);
-    // console.log(map.x, map.y);
+    console.log(player.x, player.y);
+    console.log(map.x, map.y);
     
     // Clear canvas then render.
     c.clear();
@@ -254,16 +189,16 @@ let setUpObjects = () => {
 
     // Get canvas tag and make canvas class.
     let canvasElem = document.getElementById('canvas');
-    c = new Canvas(canvasElem, WIDTH, HEIGHT);
+    window.c = new Canvas(canvasElem, WIDTH, HEIGHT);
 
     // Maps.
-    map = new Map(mapImg, 0, 0);
+    window.map = new Map(mapImg, -100, -100);
 
     // Game objects.
-    player = new Player(64 / 2, 96 / 2, characterImg, 15);
-    objects = new Objects();
+    window.player = new Player(64 / 2, 96 / 2, characterImg, 15);
+    window.objects = new Objects();
 
-    let wall1 = new Wall(300, 300, 200, 150);
+    let wall1 = new Wall(100, 100, 200, 150);
     objects.addObstacle(wall1);
 }
 
@@ -297,4 +232,58 @@ let processInput = blocking => {
     // Mouse.
 
     return command;
+}
+
+function draw(){
+    map.draw(c.ctx);
+    objects.draw(c.ctx);
+    player.draw(c.ctx);
+}
+
+// Global game move functions.
+window.moveUp = function moveUp(dist){
+    map.y -= dist;
+    objects.moveUp(dist);
+    objects.checkDownCollisions(player);
+}
+window.moveRight = function moveRight(dist){
+    map.x += dist;
+    objects.moveRight(dist);
+    objects.checkLeftCollisions(player);
+}
+window.moveDown = function moveDown(dist){
+    map.y += dist;
+    objects.moveDown(dist);
+    objects.checkUpCollisions(player);
+}
+window.moveLeft = function moveLeft(dist){
+    map.x -= dist;
+    objects.moveLeft(dist);
+    objects.checkRightCollisions(player);
+}
+
+// Player class.
+class Player{
+    constructor(width, height, imgSrc, rate){
+        this.width = width;
+        this.height = height;
+        this.mapX = (WIDTH / 2) - (this.width / 2);
+        this.mapY = (HEIGHT / 2) - (this.height / 2);
+        this.x = (WIDTH / 2) - (this.width / 2);
+        this.y = (HEIGHT / 2) - (this.height / 2);
+        this.rate = rate;
+        this.sprite = new Sprite(imgSrc, this.rate, this.width, this.height);
+        // 3
+        this.speed = 3;
+        this.state = states.STANDING;
+        this.facing = face.SOUTH;
+        this.name = 'player';
+    }
+    draw(ctx){
+        ctx.beginPath();
+        ctx.ellipse(this.x + (this.width / 2), this.y + this.height, this.width / 2, this.width / 4, Math.PI * 2, 0, Math.PI * 2, false);
+        c.setFillColor('rgba(0, 0, 0, .4');
+        ctx.fill();
+        this.sprite.draw(ctx, this.x, this.y, this.facing, this.state);
+    }
 }

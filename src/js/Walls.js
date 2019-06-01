@@ -1,10 +1,12 @@
 // import Sprite from "../src/js/Sprite.js";
 
 export default class Wall{
-    constructor(/*src, */x, y, width, height){
+    constructor(/*src, */mapX, mapY, width, height){
         // this.sprite = new Sprite(src);
-        this.x = x;
-        this.y = y;
+        this.mapX = mapX;
+        this.mapY = mapY;
+        this.x = map.x + this.mapX;
+        this.y = map.y + this.mapY;
         this.width = width;
         this.height = height;
     }
