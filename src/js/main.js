@@ -14,6 +14,7 @@ import Objects from '../js/Objects.js';
 import Key from '../js/Keyboard.js';
 import Sprite from '../js/Sprite.js';
 import Map from '../js/Map.js';
+import Wall from '../js/Walls.js';
 import * as utils from '../js/utils.js';
 import {states, commands, face} from '../js/Enums.js';
 
@@ -27,7 +28,161 @@ const WIDTH = 1024;
 const HEIGHT = 768;
 
 // Canvas class and canvas objects classes.
-let c, g, player, objects;
+let c, player, objects, map;
+
+let blocking = false;
+
+function update(command){
+    switch(command){
+        case commands.MOVE_UP:
+            if(player.y + player.height / 2 < map.y){
+                moveDown(-(map.y - (player.y + player.height / 2)));
+            }
+            // objects.checkUpCollisions(player);
+            break;
+        case commands.MOVE_RIGHT:
+            if(player.x + player.width > map.x + map.width){
+                moveLeft(-((player.x + player.width) - (map.x + map.width)));
+            }
+            // objects.checkRightCollisions(player);
+            break;
+        case commands.MOVE_DOWN:
+            if(player.y + player.height > map.y + map.height){
+                moveUp(-((player.y + player.height) - (map.y + map.height)));
+            }
+            // objects.checkDownCollisions(player);
+            break;
+        case commands.MOVE_LEFT:
+            if(player.x < map.x){
+                moveRight(-(map.x - player.x));
+            }
+            // objects.checkLeftCollisions(player);
+            break;
+        case commands.MOVE_UP_LEFT:
+            if(player.y + player.height / 2 < map.y){
+                moveDown(-(map.y - (player.y + player.height / 2)));
+            }
+            if(player.x < map.x){
+                moveRight(-(map.x - player.x));
+            }
+            // objects.checkUpCollisions(player);
+            // objects.checkLeftCollisions(player);
+            break;
+        case commands.MOVE_UP_RIGHT:
+            if(player.y + player.height / 2 < map.y){
+                moveDown(-(map.y - (player.y + player.height / 2)));
+            }
+            if(player.x + player.width > map.x + map.width){
+                moveLeft(-((player.x + player.width) - (map.x + map.width)));
+            }
+            // objects.checkUpCollisions(player);
+            // objects.checkRightCollisions(player);
+            break;
+        case commands.MOVE_DOWN_RIGHT:
+            if(player.y + player.height > map.y + map.height){
+                moveUp(-((player.y + player.height) - (map.y + map.height)));
+            }
+            if(player.x + player.width > map.x + map.width){
+                moveLeft(-((player.x + player.width) - (map.x + map.width)));
+            }
+            // objects.checkDownCollisions(player);
+            // objects.checkRightCollisions(player);
+            break;
+        case commands.MOVE_DOWN_LEFT:
+            if(player.y + player.height > map.y + map.height){
+                moveUp(-((player.y + player.height) - (map.y + map.height)));
+            }
+            if(player.x < map.x){
+                moveRight(-(map.x - player.x));
+            }
+            // objects.checkDownCollisions(player);
+            // objects.checkLeftCollisions(player);
+            break;
+    }
+}
+function draw(){
+    map.draw(c.ctx);
+    objects.draw(c.ctx);
+    player.draw(c.ctx);
+}
+function moveUp(dist){
+    map.y -= dist;
+    objects.moveUp(dist);
+    objects.checkDownCollisions(player);
+}
+function moveRight(dist){
+    map.x += dist;
+    objects.moveRight(dist);
+    objects.checkLeftCollisions(player);
+}
+function moveDown(dist){
+    map.y += dist;
+    objects.moveDown(dist);
+    objects.checkUpCollisions(player);
+}
+function moveLeft(dist){
+    map.x -= dist;
+    objects.moveLeft(dist);
+    objects.checkRightCollisions(player);
+}
+window.moveUp = moveUp;
+window.moveRight = moveRight;
+window.moveDown = moveDown;
+window.moveLeft = moveLeft;
+window.map = map;
+function handleCommands(command){
+    let speed = player.speed;
+    let diag = utils.calcDiag(player.speed);
+    switch(command){
+        case commands.STAND:
+            player.state = states.STANDING;
+            break;
+        case commands.MOVE_UP:
+            player.facing = face.NORTH;
+            player.state = states.RUNNING;
+            moveDown(speed);
+            break;
+        case commands.MOVE_RIGHT:
+            player.facing = face.EAST;
+            player.state = states.RUNNING;
+            moveLeft(speed);
+            break;
+        case commands.MOVE_DOWN:
+            player.facing = face.SOUTH;
+            player.state = states.RUNNING;
+            moveUp(speed);
+            break;
+        case commands.MOVE_LEFT:
+            player.facing = face.WEST;
+            player.state = states.RUNNING;
+            moveRight(speed);
+            break;
+        case commands.MOVE_UP_LEFT:
+            player.facing = face.NORTH_WEST;
+            player.state = states.RUNNING;
+            moveDown(diag);
+            moveRight(diag);
+            break;
+        case commands.MOVE_UP_RIGHT:
+            player.facing = face.NORTH_EAST;
+            player.state = states.RUNNING;
+            moveDown(diag);
+            moveLeft(diag);
+            break;
+        case commands.MOVE_DOWN_RIGHT:
+            player.facing = face.SOUTH_EAST;
+            player.state = states.RUNNING;
+            moveUp(diag);
+            moveLeft(diag);
+            break;
+        case commands.MOVE_DOWN_LEFT:
+            player.facing = face.SOUTH_WEST;
+            player.state = states.RUNNING;
+            moveUp(diag);
+            moveRight(diag);
+            break;
+    }
+}
 
 window.onload = e => {
     // window.onload event info.
@@ -43,101 +198,6 @@ window.onload = e => {
     gameLoop();
 }
 
-class Game{
-    constructor(){
-        this.name = 'game';
-        this.blocking = false;
-        this.map = undefined;
-    }
-    addMap(map){
-        this.map = map;
-    }
-    update(){
-        // Check collisions.
-        if(player.x < this.map.x){
-            this.moveRight(this.map, -(this.map.x - player.x));
-        }
-        if(player.y < this.map.y){
-            this.moveDown(this.map, -(this.map.y - player.y));
-        }
-        if(player.x + player.width > this.map.x + this.map.width){
-            this.moveLeft(this.map, -((player.x + player.width) - (this.map.x + this.map.width)));
-        }
-        if(player.y + player.height > this.map.y + this.map.height){
-            this.moveUp(this.map, -((player.y + player.height) - (this.map.y + this.map.height)));
-        }
-    }
-    draw(){
-        // Draw game objects.
-        this.map.draw(c.ctx);
-        objects.draw(c.ctx);
-        player.draw(c.ctx);
-    }
-    moveUp(obj, dist){
-        obj.y -= dist;
-    }
-    moveRight(obj, dist){
-        obj.x += dist;
-    }
-    moveDown(obj, dist){
-        obj.y += dist;
-    }
-    moveLeft(obj, dist){
-        obj.x -= dist;
-    }
-    handleCommands(command){
-        switch(command){
-            case commands.STAND:
-                player.state = states.STANDING;
-                break;
-            case commands.MOVE_UP:
-                player.facing = face.NORTH;
-                player.state = states.RUNNING;
-                g.moveDown(this.map, player.speed);
-                break;
-            case commands.MOVE_RIGHT:
-                player.facing = face.EAST;
-                player.state = states.RUNNING;
-                g.moveLeft(this.map, player.speed);
-                break;
-            case commands.MOVE_DOWN:
-                player.facing = face.SOUTH;
-                player.state = states.RUNNING;
-                g.moveUp(this.map, player.speed);
-                break;
-            case commands.MOVE_LEFT:
-                player.facing = face.WEST;
-                player.state = states.RUNNING;
-                g.moveRight(this.map, player.speed);
-                break;
-            case commands.MOVE_UP_LEFT:
-                player.facing = face.NORTH_WEST;
-                player.state = states.RUNNING;
-                g.moveDown(this.map, utils.calcDiag(player.speed));
-                g.moveRight(this.map, utils.calcDiag(player.speed));
-                break;
-            case commands.MOVE_UP_RIGHT:
-                player.facing = face.NORTH_EAST;
-                player.state = states.RUNNING;
-                g.moveDown(this.map, utils.calcDiag(player.speed));
-                g.moveLeft(this.map, utils.calcDiag(player.speed));
-                break;
-            case commands.MOVE_DOWN_RIGHT:
-                player.facing = face.SOUTH_EAST;
-                player.state = states.RUNNING;
-                g.moveUp(this.map, utils.calcDiag(player.speed));
-                g.moveLeft(this.map, utils.calcDiag(player.speed));
-                break;
-            case commands.MOVE_DOWN_LEFT:
-                player.facing = face.SOUTH_WEST;
-                player.state = states.RUNNING;
-                g.moveUp(this.map, utils.calcDiag(player.speed));
-                g.moveRight(this.map, utils.calcDiag(player.speed));
-                break;
-        }
-    }
-}
-
 // Player class.
 class Player{
     constructor(width, height, imgSrc, rate){
@@ -148,7 +208,7 @@ class Player{
         this.rate = rate
         this.sprite = new Sprite(imgSrc, this.rate, this.width, this.height);
         // 3
-        this.speed = 30;
+        this.speed = 5;
         this.state = states.STANDING;
         this.facing = face.SOUTH;
     }
@@ -165,20 +225,19 @@ let gameLoop = () => {
     requestAnimationFrame(gameLoop);
 
     // Process input from keyboard and mouse.
-    if(g.blocking){
-        console.log('blocking!!!!');
-    }else{
-        processInput(g.blocking);
-    }
+    let command = processInput(blocking);
 
-    // Update.
-    g.update();
+    // Handle the command from the input.
+    handleCommands(command);
+
+    // Update (check for collisions, make corrections).
+    update(command);
     // console.log(player.x, player.y);
-    // console.log(g.map.x, g.map.y);
+    // console.log(map.x, map.y);
     
     // Clear canvas then render.
     c.clear();
-    g.draw();
+    draw();
 }
 
 let setUpDocument = () => {
@@ -198,20 +257,21 @@ let setUpObjects = () => {
     c = new Canvas(canvasElem, WIDTH, HEIGHT);
 
     // Maps.
-    let map1 = new Map(mapImg, 0, 0);
+    map = new Map(mapImg, 0, 0);
 
     // Game objects.
-    g = new Game();
-    g.addMap(map1);
     player = new Player(64 / 2, 96 / 2, characterImg, 15);
     objects = new Objects();
+
+    let wall1 = new Wall(300, 300, 200, 150);
+    objects.addObstacle(wall1);
 }
 
 let processInput = blocking => {
 
     // Keyboard.
+    let command;
     if(!blocking){
-        let command;
         if(Key.isDown(Key.UP) && Key.isDown(Key.RIGHT)){
             command = commands.MOVE_UP_RIGHT
         }else if(Key.isDown(Key.RIGHT) && Key.isDown(Key.DOWN)){
@@ -232,9 +292,9 @@ let processInput = blocking => {
                 !Key.isDown(Key.DOWN) && !Key.isDown(Key.LEFT)){
             command = commands.STAND;
         }
-        g.handleCommands(command);
     }
     
     // Mouse.
 
+    return command;
 }
