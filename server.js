@@ -1,25 +1,17 @@
 const express = require('express');
-const http = require('http');
 const path = require('path');
-const socketIO = require('socket.io');
+const app = express();
+const server = require('http').createServer(app);
+const io = require('../..')(server);
+const port = process.env.PORT || 5000;
 
-let app = express();
-let server = http.Server(app);
-let io = socketIO(server);
+app.use(express.static(path.join(__dirname, 'dist')));
 
-app.set('port', 5000);
-app.use('/static', express.static(__dirname + '/static'));
-
-app.get('/', (request, response) => {
-    response.sendFile(path.join(__dirname, 'templates/index.html'));
+app.get('/', (req, res) => {
+    console.log('\n\nWaiting for another connection\n\n');
+    res.sendFile(path.resolve(__dirname + '/dist/index.html'));
 });
 
-app.listen(5000, () => {
+app.listen(port, () => {
     console.log('Listening on port 5000');
-});
-
-io.on('connection', socket => {
-    socket.on('ferret', (name, word, fn) => {
-        fn(name + ' says' + word);
-    });
 });
