@@ -4,9 +4,9 @@ module.exports = {
     mode: 'development',
     entry: './src/js/main.js',
     output: {
-        path: path.resolve(__dirname, 'dist'),
+        path: path.resolve(__dirname, 'static'),
         filename: 'bundle.js',
-        publicPath: '/'
+        publicPath: '/js'
     },
     devServer: {
         contentBase: path.join(__dirname, 'dist'),

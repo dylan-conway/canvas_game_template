@@ -1,5 +1,4 @@
 node_modules/
 debug.log
-dist/bundle.js
-dist/images/
+static/
 .vscode/
