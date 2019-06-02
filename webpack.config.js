@@ -4,12 +4,12 @@ module.exports = {
     mode: 'development',
     entry: './src/js/main.js',
     output: {
-        path: path.resolve(__dirname, './'),
-        filename: 'static/bundle.js',
+        path: path.resolve(__dirname, 'dist'),
+        filename: 'bundle.js',
         publicPath: '/'
     },
     devServer: {
-        contentBase: path.join(__dirname, 'templates'),
+        contentBase: path.join(__dirname, ''),
         compress: true,
         port: 5050
     },
