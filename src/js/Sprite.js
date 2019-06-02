@@ -17,7 +17,7 @@ export default class Sprite{
         this.height = height;
         this.imgWidth = this.img.width;
         this.imgHeight = this.img.height;
-        this.drawCounter = 0;
+        this.drawCounter = utils.getRandomInt(0, this.rate);
         // sx, sy, swidth, sheight, dwidth, dheight.
         this.info = [0, 0, this.width, this.height, this.width, this.height];
     }

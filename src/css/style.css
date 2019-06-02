@@ -1,11 +1,12 @@
 body {
-    margin: 32px 0 0 0;
+    margin: 0 0 0 0;
     overflow: hidden;
+    /* background-color: cornflowerblue; */
 }
 
 canvas {
     margin: 0 0 0 0;
-    border: 2px solid black;
+    /* border: 2px solid black; */
 }
 
 #canvasContainer {

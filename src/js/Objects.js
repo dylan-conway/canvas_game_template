@@ -4,26 +4,33 @@ import * as utils from '../js/utils.js';
 export default class Objects{
     constructor(){
         this.obstacles = [];
-        this.enemies = [];
+        this.scenery = [];
     }
     draw(ctx){
         this.obstacles.forEach(obstacle => obstacle.draw(ctx));
-        this.enemies.forEach(enemy => enemy.draw(ctx));
+        this.scenery.forEach(item => item.draw(ctx));
     }
     addObstacle(obstacle){
         this.obstacles.push(obstacle);
     }
+    addScenery(item){
+        this.scenery.push(item);
+    }
     moveUp(dist){
         this.obstacles.forEach(obstacle => {obstacle.y -= dist});
+        this.scenery.forEach(item => {item.y -= dist});
     }
     moveRight(dist){
         this.obstacles.forEach(obstacle => {obstacle.x += dist});
+        this.scenery.forEach(item => {item.x += dist});
     }
     moveDown(dist){
         this.obstacles.forEach(obstacle => {obstacle.y += dist});
+        this.scenery.forEach(item => {item.y += dist});
     }
     moveLeft(dist){
         this.obstacles.forEach(obstacle => {obstacle.x -= dist});
+        this.scenery.forEach(item => {item.x -= dist});
     }
     checkUpCollisions(o){
         this.obstacles.forEach(ob => {

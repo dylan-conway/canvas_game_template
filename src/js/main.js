@@ -15,17 +15,21 @@ import Key from '../js/Keyboard.js';
 import Sprite from '../js/Sprite.js';
 import Map from '../js/Map.js';
 import Wall from '../js/Walls.js';
+import Grass from '../js/Scenery.js';
 import * as utils from '../js/utils.js';
 import {states, commands, face} from '../js/Enums.js';
 
 // Import images.
 import faviconImg from '../images/favicon.ico';
 import characterImg from '../images/characterSprite.png';
-import mapImg from '../images/rewoven.png'
+// import mapImg from '../images/rewoven.png';
+import grassImg from '../images/grassSprite.png';
 
 // Width and height of the canvas.
-window.WIDTH = 1024;
-window.HEIGHT = 768;
+// window.WIDTH = 1024;
+// window.HEIGHT = 768;
+window.WIDTH = Math.floor(innerWidth);
+window.HEIGHT = Math.floor(innerHeight);
 
 // Canvas class and canvas objects classes. Global.
 
@@ -167,11 +171,13 @@ let gameLoop = () => {
 
     // Update (check for collisions, make corrections).
     update(command);
-    console.log(player.x, player.y);
-    console.log(map.x, map.y);
+    // console.log(player.x, player.y);
+    // console.log(map.x, map.y);
     
     // Clear canvas then render.
-    c.clear();
+    // c.clear();
+    c.ctx.fillStyle = 'white';
+    c.ctx.fillRect(0, 0, WIDTH, HEIGHT);
     draw();
 }
 
@@ -192,14 +198,21 @@ let setUpObjects = () => {
     window.c = new Canvas(canvasElem, WIDTH, HEIGHT);
 
     // Maps.
-    window.map = new Map(mapImg, -100, -100);
+    window.map = new Map(-100, -100);
 
     // Game objects.
     window.player = new Player(64 / 2, 96 / 2, characterImg, 15);
     window.objects = new Objects();
 
-    let wall1 = new Wall(100, 100, 200, 150);
-    objects.addObstacle(wall1);
+    // let wall1 = new Wall(150, 150, 64, 64);
+    // objects.addObstacle(wall1);
+    let grass = new Grass(grassImg, 150, 250, 64, 64);
+    objects.addScenery(grass);
+    for(let i = 0; i < map.width / 64; i ++){
+        for(let j = 0; j < map.height / 64; j ++){
+            objects.addScenery(new Grass(grassImg, (i * 64), (j * 64), 64, 64));
+        }
+    }
 }
 
 let processInput = blocking => {
@@ -267,10 +280,10 @@ class Player{
     constructor(width, height, imgSrc, rate){
         this.width = width;
         this.height = height;
-        this.mapX = (WIDTH / 2) - (this.width / 2);
-        this.mapY = (HEIGHT / 2) - (this.height / 2);
-        this.x = (WIDTH / 2) - (this.width / 2);
-        this.y = (HEIGHT / 2) - (this.height / 2);
+        this.mapX = Math.floor(WIDTH / 2) - (this.width / 2);
+        this.mapY = Math.floor(HEIGHT / 2) - (this.height / 2);
+        this.x = Math.floor(WIDTH / 2) - (this.width / 2);
+        this.y = Math.floor(HEIGHT / 2) - (this.height / 2);
         this.rate = rate;
         this.sprite = new Sprite(imgSrc, this.rate, this.width, this.height);
         // 3
