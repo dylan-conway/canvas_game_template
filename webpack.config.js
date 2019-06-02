@@ -4,8 +4,8 @@ module.exports = {
     mode: 'development',
     entry: './src/js/main.js',
     output: {
-        path: path.resolve(__dirname, 'static'),
-        filename: 'bundle.js',
+        path: path.resolve(__dirname, './'),
+        filename: 'static/bundle.js',
         publicPath: '/'
     },
     module: {
@@ -23,7 +23,7 @@ module.exports = {
                     loader: 'url-loader',
                     options: {
                         limit: 8000,
-                        name: 'images/[hash]-[name].[ext]'
+                        name: 'static/images/[name].[ext]'
                     }
                 }]
             }
