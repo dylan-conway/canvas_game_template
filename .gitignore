@@ -3,4 +3,5 @@ debug.log
 static/
 .vscode/
 images/
-dist/
+dist/bundle.js
+dist/static
