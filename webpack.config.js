@@ -8,6 +8,11 @@ module.exports = {
         filename: 'static/bundle.js',
         publicPath: '/'
     },
+    devServer: {
+        contentBase: path.join(__dirname, 'templates'),
+        compress: true,
+        port: 5050
+    },
     module: {
         rules: [
             {
