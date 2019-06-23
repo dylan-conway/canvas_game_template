@@ -7,8 +7,8 @@ export default class Map{
         this.y = y;
         // this.width = this.img.width;
         // this.height = this.img.height;
-        this.height = 2160;
-        this.width = 3840;
+        this.height = 2160 / 4;
+        this.width = 3840 / 4;
     }
     draw(ctx){
         // ctx.drawImage(this.img, this.x, this.y);
