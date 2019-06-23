@@ -171,7 +171,7 @@ let gameLoop = () => {
 
     // Update (check for collisions, make corrections).
     update(command);
-    // console.log(player.x, player.y);
+    // console.log(player.mapX, player.mapY);
     // console.log(map.x, map.y);
     
     // Clear canvas then render.
@@ -198,7 +198,7 @@ let setUpObjects = () => {
     window.c = new Canvas(canvasElem, WIDTH, HEIGHT);
 
     // Maps.
-    window.map = new Map(-100, -100);
+    window.map = new Map(0, 0);
 
     // Game objects.
     window.player = new Player(64 / 2, 96 / 2, characterImg, 15);
@@ -255,21 +255,25 @@ function draw(){
 
 // Global game move functions.
 window.moveUp = function moveUp(dist){
+    player.moveDown(dist);
     map.y -= dist;
     objects.moveUp(dist);
     objects.checkDownCollisions(player);
 }
 window.moveRight = function moveRight(dist){
+    player.moveLeft(dist);
     map.x += dist;
     objects.moveRight(dist);
     objects.checkLeftCollisions(player);
 }
 window.moveDown = function moveDown(dist){
+    player.moveUp(dist);
     map.y += dist;
     objects.moveDown(dist);
     objects.checkUpCollisions(player);
 }
 window.moveLeft = function moveLeft(dist){
+    player.moveRight(dist);
     map.x -= dist;
     objects.moveLeft(dist);
     objects.checkRightCollisions(player);
@@ -298,5 +302,17 @@ class Player{
         c.setFillColor('rgba(0, 0, 0, .4');
         ctx.fill();
         this.sprite.draw(ctx, this.x, this.y, this.facing, this.state);
+    }
+    moveUp(dist){
+        this.mapY -= dist;
+    }
+    moveRight(dist){
+        this.mapX += dist;
+    }
+    moveDown(dist){
+        this.mapY += dist;
+    }
+    moveLeft(dist){
+        this.mapX -= dist;
     }
 }

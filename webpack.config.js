@@ -5,11 +5,11 @@ module.exports = {
     entry: './src/js/main.js',
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: 'js/bundle.js',
+        filename: 'bundle.js',
         publicPath: '/'
     },
     devServer: {
-        contentBase: path.join(__dirname, ''),
+        contentBase: path.join(__dirname, 'dist'),
         compress: true,
         port: 5050
     },
