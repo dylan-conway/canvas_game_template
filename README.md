@@ -17,4 +17,4 @@ You can move the character in 8 directions with 'wasd'. Nothing is added to the 
 
 ## Bugs
 
-Sometimes images won't load the first time the game is in browser. If so, just refresh the page.
+Sometimes images won't load the first time the game is opened in browser. If so, just refresh the page.
